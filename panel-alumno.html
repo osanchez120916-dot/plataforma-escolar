@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<title>Panel Alumno</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+margin:0;
+display:flex;
+}
+
+.sidebar{
+
+width:220px;
+background:#1f2d3d;
+color:white;
+height:100vh;
+
+}
+
+.sidebar h2{
+text-align:center;
+padding:20px;
+}
+
+.sidebar a{
+display:block;
+padding:15px;
+cursor:pointer;
+}
+
+.sidebar a:hover{
+background:#32465a;
+}
+
+.main{
+flex:1;
+padding:30px;
+}
+
+.card{
+
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+
+}
+
+img{
+border-radius:10px;
+}
+
+.sidebar a{
+display:block;
+padding:15px;
+cursor:pointer;
+color:white;
+transition:0.2s;
+}
+
+.sidebar a i{
+margin-right:10px;
+width:20px;
+text-align:center;
+}
+
+.sidebar a:hover{
+background:#32465a;
+padding-left:20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2><i class ="fa-solid fa-user-graduate"></i>Alumno</h2>
+
+<a onclick="verPerfil()"><i class ="fa-solid fa-user"></i>Mi Perfil</a>
+<a onclick="verCalificaciones()"><i class ="fa-solid fa-chart-column"></i>Calificaciones</a>
+<a onclick="verTareas()"><i class ="fa-solid fa-book"></i>Tareas</a>
+<a onclick="verAsistencias()"><i class ="fa-solid fa-calendar-check"></i>Asistencias</a>
+<a onclick="descargarBoleta()"><i class ="fa-solid fa-file-pdf"></i>Boleta</a>
+<button onclick="CerrarSesion()" style="width:100%;padding:15px;background:none;border:none;color:#f87171;text-align:left;cursor:pointer;">
+<i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+</button>
+</div>
+
+<div class="main">
+
+<div id="contenido"></div>
+
+</div>
+
+<script>
+
+const alumno_id = localStorage.getItem("alumno_id")
+
+// PERFIL
+
+function verPerfil(){
+
+fetch("http://localhost:3001/alumno/" + alumno_id)
+
+.then(res => res.json())
+
+.then(data => {
+
+document.getElementById("contenido").innerHTML = `
+
+<div class="card">
+
+<h2>"Bienvenid@" ${data.nombre}</h2>
+
+
+<p>Grado: ${data.grado}</p>
+<p>Grupo: ${data.grupo}</p>
+
+<img src="http://localhost:3001/uploads/${data.foto}" width="150">
+
+</div>
+
+`
+
+})
+
+}
+
+// CALIFICACIONES
+
+function verCalificaciones(){
+
+fetch("http://localhost:3001/calificaciones/" + alumno_id)
+
+.then(res => res.json())
+
+.then(data => {
+
+let materias = []
+let notas = []
+
+data.forEach(c=>{
+materias.push(c.materia)
+notas.push(c.calificacion)
+})
+
+let html = `
+
+<div class="card">
+
+<h2>Mis Calificaciones</h2>
+
+<canvas id="grafica"></canvas>
+
+</div>
+
+`
+
+document.getElementById("contenido").innerHTML = html
+
+const ctx = document.getElementById("grafica")
+
+new Chart(ctx,{
+
+type:"bar",
+
+data:{
+labels:materias,
+datasets:[{
+label:"Calificaciones",
+data:notas
+}]
+}
+
+})
+
+})
+
+}
+
+// TAREAS
+
+function verTareas(){
+
+fetch("http://localhost:3001/tareas/" + alumno_id)
+
+.then(res => res.json())
+
+.then(data => {
+
+let html = `<h2>Mis Tareas</h2>`
+
+data.forEach(t=>{
+
+let estado = t.archivo ? "✅ Entregada" : "❌ Pendiente"
+
+let calificacion = t.calificacion ? "⭐ Calificación: "+t.calificacion : ""
+
+html += `
+
+<div class="card" style="margin-bottom:20px">
+
+<h3>📚 ${t.titulo}</h3>
+
+<p>${t.descripcion}</p>
+
+<p><b>📅 Entrega:</b> ${new Date(t.fecha).toLocaleDateString('es-MX')}</p>
+
+<p><b>Estado:</b> ${estado}</p>
+
+<p>${calificacion}</p>
+
+${!t.archivo ? `
+<input type="file" id="archivo${t.id}">
+<br><br>
+<button onclick="subirTarea(${t.id})">
+Subir tarea
+</button>
+` : `
+<p>Archivo enviado</p>
+`}
+
+</div>
+
+`
+
+})
+
+document.getElementById("contenido").innerHTML = html
+
+})
+
+}
+
+// ASISTENCIAS
+
+function verAsistencias(){
+
+fetch("http://localhost:3001/asistencias/" + alumno_id)
+
+.then(res => res.json())
+
+.then(data => {
+
+let html = "<div class='card'><h2>Asistencias</h2>"
+
+data.forEach(a=>{
+
+html += `
+
+<p>
+${new Date(a.fecha).toLocaleDateString('es-MX')}- ${a.estado}
+</p>
+
+`
+
+})
+
+html += "</div>"
+
+document.getElementById("contenido").innerHTML = html
+
+})
+
+}
+
+// cargar perfil al entrar
+
+verPerfil()
+
+function descargarBoleta(){
+
+fetch("http://localhost:3001/calificaciones/" + alumno_id)
+
+.then(res => res.json())
+
+.then(data => {
+
+let contenido = `
+<h1>Boleta de Calificaciones</h1>
+`
+
+data.forEach(c=>{
+
+contenido += `
+<p>${c.materia}: ${c.calificacion}</p>
+`
+
+})
+
+const ventana = window.open()
+
+ventana.document.write(contenido)
+
+ventana.print()
+
+})
+
+}
+
+function subirTarea(tarea_id){
+
+const archivo = document.getElementById("archivo"+tarea_id).files[0]
+
+const formData = new FormData()
+
+formData.append("archivo", archivo)
+formData.append("tarea_id", tarea_id)
+formData.append("alumno_id", alumno_id)
+
+fetch("http://localhost:3001/entregar-tarea",{
+
+method:"POST",
+body:formData
+
+})
+
+.then(res=>res.text())
+
+.then(data=>{
+
+alert(data)
+verTareas() // 🔥 ACTUALIZA LA VISTA
+
+})
+
+}
+
+function CerrarSesion(){
+   // if (confirm("Seguro que quieres salir de tu plataforma")){
+        localStorage.removeItem("alumno_id")
+        alert("Sesion cerrada")
+        window.location.href="login.html"
+    }
+//}
+
+if(!localStorage.getItem("alumno_id")){
+    window.location.href="login.html"
+}
+</script>
+
+</body>
+
+</html>

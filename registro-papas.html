@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Registrar Papá</title>
+
+<style>
+
+body{
+font-family: Arial, sans-serif;
+background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("img/fondo1.jpeg");
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.form-box{
+background:white;
+padding:40px;
+border-radius:10px;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+width:320px;
+text-align:center;
+}
+
+.form-box h2{
+margin-bottom:20px;
+}
+
+.form-box input{
+width:100%;
+padding:10px;
+margin:10px 0;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+.form-box button{
+width:100%;
+padding:10px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+font-size:16px;
+}
+
+.form-box button:hover{
+background:#1d4ed8;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="form-box">
+
+<h2>Registrar Papá</h2>
+
+<input type="text" id="nombre" placeholder="Nombre">
+
+<input type="text" id="telefono" placeholder="Teléfono">
+
+<input type="email" id="correo" placeholder="Correo">
+
+<select id="alumno_id"></select>
+
+<button onclick="registrarPapa()">Registrar</button>
+
+</div>
+
+<script>
+
+// =============================
+// CARGAR ALUMNOS AL INICIAR
+// =============================
+
+fetch("http://localhost:3001/alumnos")
+.then(res => res.json())
+.then(data => {
+
+let opciones = "<option value=''>Selecciona un alumno</option>"
+
+data.forEach(a=>{
+opciones += `<option value="${a.id}">${a.nombre}</option>`
+})
+
+document.getElementById("alumno_id").innerHTML = opciones
+
+})
+
+// =============================
+// REGISTRAR PAPÁ
+// =============================
+
+function registrarPapa(){
+
+const nombre = document.getElementById("nombre").value
+const telefono = document.getElementById("telefono").value
+const correo = document.getElementById("correo").value
+const alumno_id = document.getElementById("alumno_id").value
+
+fetch("http://localhost:3001/papas",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+nombre,
+telefono,
+correo,
+alumno_id
+})
+
+})
+
+.then(res=>res.text())
+.then(data=>{
+
+alert(data)
+
+window.location.href="papas.html"
+
+})
+
+}
+
+
+</script>
+
+</body>
+</html>

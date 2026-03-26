@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Registrar Alumno</title>
+
+<style>
+
+body{
+font-family: Arial, sans-serif;
+background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("img/fondo.jpeg");
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.form-box{
+background:white;
+padding:30px;
+border-radius:10px;
+width:350px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+text-align:center;
+}
+
+h2{
+margin-bottom:20px;
+color:#1e293b;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin:8px 0;
+border:1px solid #ccc;
+border-radius:5px;
+font-size:14px;
+}
+
+input:focus,select:focus{
+outline:none;
+border-color:#2563eb;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#2563eb;
+border:none;
+color:white;
+font-size:16px;
+border-radius:5px;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+#preview{
+margin-top:10px;
+border-radius:10px;
+border:1px solid #ddd;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="form-box">
+
+<h2>Registrar Alumno</h2>
+
+<input id="nombre" placeholder="Nombre">
+
+<input id="correo" placeholder="Correo">
+
+<input id="grado" placeholder="Grado">
+
+<input id="grupo" placeholder="Grupo">
+
+<select id="maestro">
+<option value="">Seleccionar maestro</option>
+</select>
+
+<input type="file" id="foto">
+
+<img id="preview" width="120">
+
+<button onclick="crearAlumno()">Registrar</button>
+
+</div>
+
+<script>
+
+// cargar maestros en el select
+
+fetch("http://localhost:3001/maestros")
+.then(res => res.json())
+.then(data => {
+
+let select = document.getElementById("maestro")
+
+data.forEach(m => {
+
+select.innerHTML += `
+<option value="${m.id}">${m.nombre}</option>
+`
+
+})
+
+})
+
+function crearAlumno(){
+
+const nombre = document.getElementById("nombre").value
+const correo = document.getElementById("correo").value
+const grado = document.getElementById("grado").value
+const grupo = document.getElementById("grupo").value
+const maestro = document.getElementById("maestro").value
+const fotoInput = document.getElementById("foto")
+
+const formData = new FormData()
+
+formData.append("nombre", nombre)
+formData.append("correo", correo)
+formData.append("grado", grado)
+formData.append("grupo", grupo)
+formData.append("maestro_id", maestro)
+formData.append("foto", fotoInput.files[0])
+
+fetch("http://localhost:3001/alumnos",{
+method:"POST",
+body:formData
+})
+
+.then(res => res.text())
+.then(data =>{
+
+alert("Alumno registrado correctamente 🎓")
+
+window.location.href = "alumnos.html"
+
+})
+
+}
+
+// vista previa foto
+
+document.getElementById("foto").addEventListener("change", function(){
+
+const file = this.files[0]
+
+if(file){
+
+document.getElementById("preview").src = URL.createObjectURL(file)
+
+}
+
+})
+
+</script>
+
+</body>
+
+</html>

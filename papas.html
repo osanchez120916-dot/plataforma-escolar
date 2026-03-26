@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Lista de Papás</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f1f5f9;
+padding:40px;
+}
+
+h2{
+margin-bottom:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+th,td{
+padding:12px;
+border-bottom:1px solid #ddd;
+text-align:left;
+}
+
+th{
+background:#1e293b;
+color:white;
+}
+
+tr:hover{
+background:#f3f4f6;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Lista de Papás Registrados</h2>
+<button onclick="generarUsuariosPapas()" style="
+background:#22c55e;
+color:white;
+padding:10px 15px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+margin-bottom:15px;
+">
+Generar usuarios papás
+</button>
+<table>
+
+<thead>
+
+<tr>
+<th>ID</th>
+<th>Nombre</th>
+<th>Teléfono</th>
+<th>Correo</th>
+</tr>
+
+</thead>
+
+<tbody id="tabla-papas"></tbody>
+
+</table>
+
+<script>
+
+fetch("http://localhost:3001/papas")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let tabla=""
+
+data.forEach(papa=>{
+
+tabla+=`
+
+<tr>
+
+<td>${papa.id}</td>
+<td>${papa.nombre}</td>
+<td>${papa.telefono}</td>
+<td>${papa.correo}</td>
+
+</tr>
+
+`
+
+})
+
+document.getElementById("tabla-papas").innerHTML=tabla
+
+})
+
+
+function generarUsuariosPapas(){
+
+fetch("http://localhost:3001/admin/generar-usuarios-papas",{
+method:"POST"
+})
+
+.then(res=>res.text())
+.then(data=>{
+alert(data)
+})
+
+}
+
+</script>
+
+</body>
+</html>

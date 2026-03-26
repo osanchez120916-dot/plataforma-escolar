@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Panel del Papá</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#f4f6f9;
+display:flex;
+}
+
+.sidebar{
+width:220px;
+background:#2c3e50;
+height:100vh;
+color:white;
+padding-top:20px;
+}
+
+.sidebar h2{
+text-align:center;
+}
+
+.sidebar a{
+display:block;
+color:white;
+padding:15px;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#34495e;
+}
+
+.main{
+flex:1;
+padding:30px;
+}
+
+.card{
+background:white;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+padding:20px;
+margin-bottom:20px;
+}
+
+.alumno{
+display:flex;
+align-items:center;
+gap:20px;
+}
+
+.alumno img{
+width:120px;
+height:120px;
+border-radius:50%;
+object-fit:cover;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #ddd;
+}
+
+.logout-btn{
+    background:#e74c3c;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.logout-btn:hover{
+    background:#c0392b;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>Papá</h2>
+
+<a href="#">Inicio</a>
+<a href="#">Calificaciones</a>
+<a href="#">Asistencias</a>
+<a href="#">Tareas</a>
+
+</div>
+
+<div class="main">
+    <div class="topbar">
+    <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
+</div>
+
+
+<div class="card">
+<div id="alumno">Cargando alumno...</div>
+</div>
+
+<div class="card">
+
+<h3>Calificaciones</h3>
+
+<table id="tablaCalificaciones">
+
+<tr>
+<th>Materia</th>
+<th>Calificación</th>
+</tr>
+
+</table>
+
+</div>
+
+<div class="card">
+
+<h3>Asistencias</h3>
+
+<table id="tablaAsistencias">
+
+<tr>
+<th>Fecha</th>
+<th>Estado</th>
+</tr>
+
+</table>
+
+</div>
+
+<div class="card">
+
+<h3>Tareas</h3>
+
+<table id="tablaTareas">
+
+<tr>
+<th>Título</th>
+<th>Descripción</th>
+<th>Fecha</th>
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+const papa_id = localStorage.getItem("papa_id")
+
+fetch("http://localhost:3001/hijos/" + papa_id)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+const alumno = data[0]
+
+localStorage.setItem("alumno_id", alumno.id)
+
+document.getElementById("alumno").innerHTML = `
+
+<div class="alumno">
+
+<img src="http://localhost:3001/uploads/${alumno.foto}">
+
+<div>
+
+<h2>${alumno.nombre}</h2>
+
+<p><b>Grado:</b> ${alumno.grado}</p>
+<p><b>Grupo:</b> ${alumno.grupo}</p>
+
+</div>
+
+</div>
+
+`
+
+// ================= CALIFICACIONES =================
+
+fetch("http://localhost:3001/calificaciones/" + alumno.id)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let tabla = document.getElementById("tablaCalificaciones")
+
+data.forEach(c=>{
+
+tabla.innerHTML += `
+<tr>
+<td>${c.materia}</td>
+<td>${c.calificacion}</td>
+</tr>
+`
+
+})
+
+})
+
+// ================= ASISTENCIAS =================
+
+fetch("http://localhost:3001/asistencias/" + alumno.id)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let tabla = document.getElementById("tablaAsistencias")
+
+data.forEach(a=>{
+
+tabla.innerHTML += `
+<tr>
+<td>${new Date(a.fecha).toLocaleDateString('es-MX')}</td>
+<td>${a.estado}</td>
+</tr>
+`
+
+})
+
+})
+
+// ================= TAREAS =================
+
+fetch("http://localhost:3001/tareas/" + alumno.id)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let tabla = document.getElementById("tablaTareas")
+
+data.forEach(t=>{
+
+tabla.innerHTML += `
+<tr>
+<td>${t.titulo}</td>
+<td>${t.descripcion}</td>
+<td>${new Date(t.fecha).toLocaleDateString('es-MX')}</td>
+</tr>
+`
+
+})
+
+})
+
+})
+
+function cerrarSesion(){
+    localStorage.removeItem("maestro_id")
+    window.location.href = "login.html"
+}
+</script>
+
+</body>
+</html>

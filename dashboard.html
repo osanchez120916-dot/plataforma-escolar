@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Panel Escolar CEPM</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+display:flex;
+background:#f1f5f9;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:220px;
+background:#1e293b;
+color:white;
+height:100vh;
+padding:20px;
+}
+
+.sidebar h2{
+margin-bottom:30px;
+}
+
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+margin:15px 0;
+}
+
+.sidebar a:hover{
+color:#38bdf8;
+}
+
+/* CONTENT */
+
+.content{
+flex:1;
+padding:40px;
+}
+
+/* HEADER SUPERIOR */
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+}
+
+.topbar h1{
+margin:0;
+}
+
+#usuario{
+font-weight:bold;
+margin-right:10px;
+}
+
+/* CARDS */
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 10px rgba(0,0,0,0.1);
+width:200px;
+display:inline-block;
+margin:10px;
+text-align:center;
+}
+
+.card i{
+font-size:30px;
+color:#2563eb;
+margin-bottom:10px;
+}
+
+/* BOTON */
+
+button{
+background:#ef4444;
+border:none;
+color:white;
+padding:8px 12px;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#dc2626;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>CEPM</h2>
+
+<a href="#"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+<a href="registro-alumno.html"><i class="fa-solid fa-user-plus"></i> Registrar Alumno</a>
+<a href="alumnos.html"><i class="fa-solid fa-users"></i> Ver alumnos</a>
+<a href="registro-papas.html"><i class="fa-solid fa-user-plus"></i>Registrar Papá</a>
+<a href="papas.html"><i class="fa-solid fa-users"></i>Ver Papás</a>
+<a href="#"><i class="fa-solid fa-book"></i> Tareas</a>
+<a href="#"><i class="fa-solid fa-graduation-cap"></i> Calificaciones</a>
+
+</div>
+
+
+
+<div class="content">
+
+<div class="topbar">
+
+<div>
+
+<h1>Panel Administrativo</h1>
+<p id="fecha"></p>
+
+</div>
+
+<div>
+
+<span id="usuario"></span>
+<button onclick="cerrarSesion()">Cerrar sesión</button>
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+<i class="fa-solid fa-user-graduate"></i>
+<h3>Alumnos</h3>
+<p id="total-alumnos">0</p>
+</div>
+
+<div class="card">
+<i class="fa-solid fa-book"></i>
+<h3>Tareas</h3>
+<p>Administrar tareas</p>
+</div>
+
+<div class="card">
+<i class="fa-solid fa-chart-column"></i>
+<h3>Calificaciones</h3>
+<p>Gestionar notas</p>
+</div>
+
+
+
+</div>
+
+
+
+<script>
+
+/* VERIFICAR ROL */
+
+let rol = localStorage.getItem("rol")
+
+if(rol !== "admin"){
+alert("No tienes acceso")
+window.location.href="login.html"
+}
+
+/* USUARIO */
+
+let usuario = localStorage.getItem("usuario")
+
+if(!usuario){
+window.location.href="login.html"
+}
+
+document.getElementById("usuario").innerText = "Bienvenido " + usuario
+
+
+/* CONTADOR DE ALUMNOS */
+
+fetch("http://localhost:3001/alumnos")
+
+.then(res => res.json())
+
+.then(data => {
+
+document.getElementById("total-alumnos").innerText = data.length
+
+})
+
+
+/* FECHA Y HORA */
+
+function actualizarHora(){
+
+let ahora = new Date()
+
+document.getElementById("fecha").innerText = ahora.toLocaleString()
+
+}
+
+actualizarHora()
+
+setInterval(actualizarHora,1000)
+
+
+/* CERRAR SESION */
+
+function cerrarSesion(){
+
+localStorage.removeItem("usuario")
+localStorage.removeItem("rol")
+
+window.location.href = "login.html"
+
+}
+
+// =============================
+// ASIGNAR USUARIO A ALUMNO
+// =============================
+
+app.post("/admin/crear-usuario-alumno",(req,res)=>{
+
+const {id,usuario,password} = req.body
+
+const sql = `
+UPDATE alumnos
+SET usuario = ?, password = ?
+WHERE id = ?
+`
+
+db.query(sql,[usuario,password,id],(err,result)=>{
+
+if(err){
+console.log(err)
+res.send("Error al crear usuario")
+}else{
+res.send("Usuario creado correctamente")
+}
+
+})
+
+})
+
+</script>
+
+</body>
+
+</html>

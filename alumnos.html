@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Lista de Alumnos</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#f1f5f9;
+margin:0;
+padding:40px;
+}
+
+h1{
+margin-bottom:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+box-shadow:0 5px 10px rgba(0,0,0,0.1);
+}
+
+th,td{
+padding:12px;
+border-bottom:1px solid #ddd;
+text-align:center;
+}
+
+th{
+background:#1e293b;
+color:white;
+}
+
+.foto{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+}
+
+button{
+border:none;
+color:white;
+padding:8px 12px;
+border-radius:5px;
+cursor:pointer;
+margin:3px;
+}
+
+.btn-eliminar{
+background:#ef4444;
+}
+
+.btn-eliminar:hover{
+background:#dc2626;
+}
+
+.btn-credencial{
+background:#2563eb;
+}
+
+.btn-credencial:hover{
+background:#1d4ed8;
+}
+
+.btn-generar{
+background:#16a34a;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:6px;
+cursor:pointer;
+margin-bottom:20px;
+font-weight:bold;
+}
+
+.btn-generar:hover{
+background:#15803d;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Lista de Alumnos</h1>
+<button class="btn-generar" onclick="generarUsuarios()">
+<i class="fa-solid fa-user fa-user-plus"></i>
+Generar usuarios
+</button>
+<table>
+
+<thead>
+
+<tr>
+<th>#</th>
+<th>Foto</th>
+<th>Nombre</th>
+<th>Correo</th>
+<th>Grado</th>
+<th>Grupo</th>
+<th>Maestro</th>
+<th>Acciones</th>
+</tr>
+
+</thead>
+
+<tbody id="tabla-alumnos">
+
+</tbody>
+
+</table>
+
+
+
+<script>
+
+fetch("http://localhost:3001/alumnos")
+
+.then(res => res.json())
+
+.then(data => {
+
+let tabla = document.getElementById("tabla-alumnos");
+
+tabla.innerHTML = "";
+
+data.forEach((alumno,index) => {
+
+let opciones = maestros.map(m=>`
+<option value="${m.id}">${m.nombre}</option>
+`).join("")    
+
+tabla.innerHTML += `
+<tr>
+
+<td>${index + 1}</td>
+
+<td>
+<img src="http://localhost:3001/uploads/${alumno.foto}" class="foto">
+</td>
+
+<td>${alumno.nombre}</td>
+
+<td>${alumno.correo}</td>
+
+<td>${alumno.grado}</td>
+
+<td>${alumno.grupo}</td>
+
+<td>
+
+<select onchange="asignarMaestro(${alumno.id}, this.value)">
+
+<option value="">Asignar maestro</option>
+
+${opciones}
+
+</select>
+
+</td>
+
+
+
+<td>
+<button class="btn-credencial" onclick="verCredencial(${alumno.id})">Credencial</button>
+<button class="btn-eliminar" onclick="eliminarAlumno(${alumno.id})">Eliminar</button>
+</td>
+
+</tr>
+`;
+
+});
+
+});
+
+
+
+function eliminarAlumno(id){
+
+fetch(`http://localhost:3001/alumnos/${id}`,{
+method:"DELETE"
+})
+
+.then(res => res.text())
+
+.then(data =>{
+
+alert("Alumno eliminado");
+
+location.reload();
+
+})
+
+}
+
+
+
+function verCredencial(id){
+
+fetch("http://localhost:3001/alumnos")
+
+.then(res => res.json())
+
+.then(data =>{
+
+let alumno = data.find(a => a.id == id)
+
+let ventana = window.open("","Credencial","width=420,height=520")
+
+ventana.document.write(`
+
+<style>
+
+body{
+font-family:Arial;
+background:#e2e8f0;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.credencial{
+width:320px;
+background:white;
+border-radius:15px;
+box-shadow:0 10px 20px rgba(0,0,0,0.2);
+overflow:hidden;
+text-align:center;
+}
+
+.header{
+background:#1e293b;
+color:white;
+padding:15px;
+font-size:16px;
+font-weight:bold;
+}
+
+.logo{
+width:80px;
+margin-bottom:5px;
+}
+
+.foto-credencial{
+width:120px;
+height:120px;
+border-radius:50%;
+margin-top:15px;
+object-fit:cover;
+border:4px solid #38bdf8;
+}
+
+.info{
+padding:15px;
+font-size:14px;
+}
+
+.info p{
+margin:6px 0;
+}
+
+.btn{
+margin-bottom:15px;
+padding:8px 15px;
+border:none;
+background:#2563eb;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+.btn:hover{
+background:#1d4ed8;
+}
+
+</style>
+
+
+<div class="credencial">
+
+<div class="header">
+
+<img src="img/cepm.jpg" class="logo">
+
+<p>Credencial Escolar</p>
+
+</div>
+
+<img src="http://localhost:3001/uploads/${alumno.foto}" class="foto-credencial">
+
+<div class="info">
+
+<p><b>Nombre:</b> ${alumno.nombre}</p>
+
+<p><b>Correo:</b> ${alumno.correo}</p>
+
+<p><b>Grado:</b> ${alumno.grado}</p>
+
+<p><b>Grupo:</b> ${alumno.grupo}</p>
+
+</div>
+
+<button class="btn" onclick="window.print()">Imprimir</button>
+
+</div>
+
+`)
+
+})
+
+}
+
+function generarUsuarios(){
+
+fetch("http://localhost:3001/admin/generar-usuarios",{
+method:"POST"
+})
+
+.then(res => res.text())
+
+.then(data =>{
+
+alert(data)
+
+})
+
+}
+
+let maestros = []
+
+fetch("http://localhost:3001/maestros")
+.then(res=>res.json())
+.then(data=>{
+maestros = data
+})
+
+function asignarMaestro(alumno_id, maestro_id){
+
+fetch("http://localhost:3001/admin/asignar-maestro",{
+
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+alumno_id,
+maestro_id
+})
+
+})
+
+.then(res=>res.text())
+.then(data=>alert(data))
+
+}
+
+</script>
+
+</body>
+
+</html>

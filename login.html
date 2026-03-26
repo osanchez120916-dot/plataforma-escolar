@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Plataforma Escolar</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#667eea,#764ba2);
+}
+
+/* CONTENEDOR */
+
+.login-box{
+background:white;
+padding:40px;
+border-radius:15px;
+width:100%;
+max-width:350px;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+text-align:center;
+animation:fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+.login-box h2{
+margin-bottom:20px;
+color:#333;
+}
+
+/* INPUTS */
+
+.input-group{
+position:relative;
+margin-bottom:20px;
+}
+
+.input-group input{
+width:100%;
+padding:12px;
+border-radius:8px;
+border:1px solid #ccc;
+outline:none;
+font-size:14px;
+transition:0.3s;
+}
+
+.input-group input:focus{
+border-color:#667eea;
+box-shadow:0 0 5px rgba(102,126,234,0.5);
+}
+
+/* BOTÓN */
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+background:#667eea;
+color:white;
+font-size:16px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#5a67d8;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:400px){
+.login-box{
+padding:25px;
+}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+<h2>🎓 Plataforma Escolar</h2>
+
+<div class="input-group">
+<input id="usuario" placeholder="Usuario o correo">
+</div>
+
+<div class="input-group">
+<input type="password" id="password" placeholder="Contraseña">
+</div>
+
+<button onclick="login()">Entrar</button>
+<p style="margin-top:10px; font-size:14px;">
+<a href="#" onclick="recuperarPassword()" style="color:#667eea; cursor:pointer;">
+¿Olvidaste tu contraseña?
+</a>
+</p>
+
+</div>
+
+
+<script>
+
+function login(){
+
+const usuario = document.getElementById("usuario").value
+const password = document.getElementById("password").value
+
+fetch("http://localhost:3001/login",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+usuario:usuario,
+password:password
+})
+
+})
+
+.then(res=>res.json())
+
+.then(data=>{
+
+console.log(data)
+
+alert(data.mensaje)
+
+if(data.mensaje==="Login correcto"){
+
+localStorage.clear()
+
+localStorage.setItem("rol",data.rol)
+localStorage.setItem("usuario", data.usuario)
+
+if(data.rol==="admin"){
+window.location.href="dashboard.html"
+}
+
+if(data.rol==="maestro"){
+localStorage.setItem("maestro_id",data.maestro_id)
+window.location.href="panel-maestro.html"
+}
+
+if(data.rol==="alumno"){
+localStorage.setItem("alumno_id",data.alumno_id)
+window.location.href="panel-alumno.html"
+}
+
+if(data.rol==="padre"){
+localStorage.setItem("papa_id",data.papa_id)
+window.location.href="panel-padre.html"
+}
+
+}
+
+})
+
+.catch(error=>{
+console.log(error)
+alert("Error conectando con el servidor")
+})
+
+}
+function recuperarPassword(){
+
+const usuario = prompt("Ingresa tu usuario o correo")
+
+if(!usuario) return
+
+const nueva = prompt("Ingresa tu nueva contraseña")
+
+if(!nueva) return
+
+fetch("http://localhost:3001/cambiar-password",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+usuario,
+nuevaPassword: nueva
+})
+})
+.then(res=>res.text())
+.then(data=>{
+alert(data)
+})
+
+}
+
+
+</script>
+
+</body>
+
+</html>
