@@ -100,21 +100,13 @@ border:1px solid #ddd;
 
 </div>
 
-<script>
-
-// cargar maestros en el select
-
-fetch("http://localhost:3001/maestros")
-.then(res => res.json())
-.then(data => {
-
-let select = document.getElementById("maestro")
-
 data.forEach(m => {
 
-select.innerHTML += `
-<option value="${m.id}">${m.nombre}</option>
-`
+let option = document.createElement("option")
+option.value = m.id
+option.textContent = m.nombre
+
+select.appendChild(option)
 
 })
 
@@ -138,7 +130,7 @@ formData.append("grupo", grupo)
 formData.append("maestro_id", maestro)
 formData.append("foto", fotoInput.files[0])
 
-fetch("http://localhost:3001/alumnos",{
+fetch("/alumnos",{
 method:"POST",
 body:formData
 })
@@ -146,24 +138,21 @@ body:formData
 .then(res => res.text())
 .then(data =>{
 
-alert("Alumno registrado correctamente 🎓")
-
+alert(data)
 window.location.href = "alumnos.html"
 
 })
 
 }
 
-// vista previa foto
+// preview
 
 document.getElementById("foto").addEventListener("change", function(){
 
 const file = this.files[0]
 
 if(file){
-
 document.getElementById("preview").src = URL.createObjectURL(file)
-
 }
 
 })
