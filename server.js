@@ -149,9 +149,7 @@ db.query(sql,(err,result)=>{
 
 if(err){
 console.log(err)
-res.send("Error")
-}else{
-res.json(result)
+res.send(err)
 }
 
 })
