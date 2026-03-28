@@ -757,6 +757,10 @@ res.send("Tarea calificada correctamente")
 
 })
 
+app.get("/test", (req, res) => {
+  res.send("FUNCIONA")
+})
+
 // =============================
 // SERVIDOR
 // =============================
