@@ -1,9 +1,12 @@
 <!DOCTYPE html>
+
 <html>
 
 <head>
 <meta charset="UTF-8">
 <title>Lista de Alumnos</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 
@@ -90,14 +93,14 @@ background:#15803d;
 <body>
 
 <h1>Lista de Alumnos</h1>
+
 <button class="btn-generar" onclick="generarUsuarios()">
-<i class="fa-solid fa-user fa-user-plus"></i>
-Generar usuarios
+<i class="fa-solid fa-user-plus"></i> Generar usuarios
 </button>
+
 <table>
 
 <thead>
-
 <tr>
 <th>#</th>
 <th>Foto</th>
@@ -105,37 +108,31 @@ Generar usuarios
 <th>Correo</th>
 <th>Grado</th>
 <th>Grupo</th>
-<th>Maestro</th>
 <th>Acciones</th>
 </tr>
-
 </thead>
 
 <tbody id="tabla-alumnos">
-
 </tbody>
 
 </table>
 
-
-
 <script>
 
-fetch("http://localhost:3001/alumnos")
+// =============================
+// CARGAR ALUMNOS
+// =============================
 
+function cargarAlumnos(){
+
+fetch("/alumnos")
 .then(res => res.json())
-
 .then(data => {
 
 let tabla = document.getElementById("tabla-alumnos");
-
 tabla.innerHTML = "";
 
 data.forEach((alumno,index) => {
-
-let opciones = maestros.map(m=>`
-<option value="${m.id}">${m.nombre}</option>
-`).join("")    
 
 tabla.innerHTML += `
 <tr>
@@ -143,7 +140,7 @@ tabla.innerHTML += `
 <td>${index + 1}</td>
 
 <td>
-<img src="http://localhost:3001/uploads/${alumno.foto}" class="foto">
+<img src="/uploads/${alumno.foto}" class="foto">
 </td>
 
 <td>${alumno.nombre}</td>
@@ -155,20 +152,6 @@ tabla.innerHTML += `
 <td>${alumno.grupo}</td>
 
 <td>
-
-<select onchange="asignarMaestro(${alumno.id}, this.value)">
-
-<option value="">Asignar maestro</option>
-
-${opciones}
-
-</select>
-
-</td>
-
-
-
-<td>
 <button class="btn-credencial" onclick="verCredencial(${alumno.id})">Credencial</button>
 <button class="btn-eliminar" onclick="eliminarAlumno(${alumno.id})">Eliminar</button>
 </td>
@@ -178,39 +161,55 @@ ${opciones}
 
 });
 
-});
-
-
-
-function eliminarAlumno(id){
-
-fetch(`http://localhost:3001/alumnos/${id}`,{
-method:"DELETE"
 })
-
-.then(res => res.text())
-
-.then(data =>{
-
-alert("Alumno eliminado");
-
-location.reload();
-
+.catch(err=>{
+console.log(err)
+alert("Error cargando alumnos")
 })
 
 }
 
+cargarAlumnos()
 
+// =============================
+// ELIMINAR ALUMNO
+// =============================
+
+function eliminarAlumno(id){
+
+if(!confirm("¿Seguro que quieres eliminar este alumno?")) return
+
+fetch(`/alumnos/${id}`,{
+method:"DELETE"
+})
+.then(res => res.text())
+.then(data =>{
+alert("Alumno eliminado")
+cargarAlumnos()
+})
+.catch(err=>{
+console.log(err)
+alert("Error al eliminar")
+})
+
+}
+
+// =============================
+// VER CREDENCIAL
+// =============================
 
 function verCredencial(id){
 
-fetch("http://localhost:3001/alumnos")
-
+fetch("/alumnos")
 .then(res => res.json())
-
 .then(data =>{
 
 let alumno = data.find(a => a.id == id)
+
+if(!alumno){
+alert("Alumno no encontrado")
+return
+}
 
 let ventana = window.open("","Credencial","width=420,height=520")
 
@@ -225,6 +224,7 @@ display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
+margin:0;
 }
 
 .credencial{
@@ -242,11 +242,6 @@ color:white;
 padding:15px;
 font-size:16px;
 font-weight:bold;
-}
-
-.logo{
-width:80px;
-margin-bottom:5px;
 }
 
 .foto-credencial{
@@ -277,33 +272,21 @@ border-radius:6px;
 cursor:pointer;
 }
 
-.btn:hover{
-background:#1d4ed8;
-}
-
 </style>
-
 
 <div class="credencial">
 
 <div class="header">
-
-<img src="img/cepm.jpg" class="logo">
-
-<p>Credencial Escolar</p>
-
+Credencial Escolar
 </div>
 
-<img src="http://localhost:3001/uploads/${alumno.foto}" class="foto-credencial">
+<img src="/uploads/${alumno.foto}" class="foto-credencial">
 
 <div class="info">
 
 <p><b>Nombre:</b> ${alumno.nombre}</p>
-
 <p><b>Correo:</b> ${alumno.correo}</p>
-
 <p><b>Grado:</b> ${alumno.grado}</p>
-
 <p><b>Grupo:</b> ${alumno.grupo}</p>
 
 </div>
@@ -315,51 +298,30 @@ background:#1d4ed8;
 `)
 
 })
+.catch(err=>{
+console.log(err)
+alert("Error generando credencial")
+})
 
 }
+
+// =============================
+// GENERAR USUARIOS
+// =============================
 
 function generarUsuarios(){
 
-fetch("http://localhost:3001/admin/generar-usuarios",{
+fetch("/admin/generar-usuarios",{
 method:"POST"
 })
-
 .then(res => res.text())
-
 .then(data =>{
-
 alert(data)
-
 })
-
-}
-
-let maestros = []
-
-fetch("http://localhost:3001/maestros")
-.then(res=>res.json())
-.then(data=>{
-maestros = data
+.catch(err=>{
+console.log(err)
+alert("Error generando usuarios")
 })
-
-function asignarMaestro(alumno_id, maestro_id){
-
-fetch("http://localhost:3001/admin/asignar-maestro",{
-
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-alumno_id,
-maestro_id
-})
-
-})
-
-.then(res=>res.text())
-.then(data=>alert(data))
 
 }
 
