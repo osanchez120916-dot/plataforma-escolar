@@ -117,6 +117,8 @@ background:#dc2626;
 <a href="papas.html"><i class="fa-solid fa-users"></i>Ver Papás</a>
 <a href="#"><i class="fa-solid fa-book"></i> Tareas</a>
 <a href="#"><i class="fa-solid fa-graduation-cap"></i> Calificaciones</a>
+<a href="registro-maestro.html"><i class="fa-solid fa-chalkboard-user"></i> Registrar Maestro
+</a>
 
 </div>
 
@@ -232,29 +234,6 @@ window.location.href = "login.html"
 // =============================
 // ASIGNAR USUARIO A ALUMNO
 // =============================
-
-app.post("/admin/crear-usuario-alumno",(req,res)=>{
-
-const {id,usuario,password} = req.body
-
-const sql = `
-UPDATE alumnos
-SET usuario = ?, password = ?
-WHERE id = ?
-`
-
-db.query(sql,[usuario,password,id],(err,result)=>{
-
-if(err){
-console.log(err)
-res.send("Error al crear usuario")
-}else{
-res.send("Usuario creado correctamente")
-}
-
-})
-
-})
 
 </script>
 
