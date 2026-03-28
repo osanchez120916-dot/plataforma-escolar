@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Registrar Maestro</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f4f6f9;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.box{
+background:white;
+padding:30px;
+border-radius:10px;
+width:300px;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+}
+
+input{
+width:100%;
+padding:10px;
+margin:10px 0;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+button{
+width:100%;
+padding:10px;
+background:#667eea;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Registrar Maestro</h2>
+
+<input id="nombre" placeholder="Nombre">
+<input id="correo" placeholder="Correo">
+<input id="usuario" placeholder="Usuario">
+<input id="password" placeholder="Contraseña">
+
+<button onclick="registrar()">Registrar</button>
+
+</div>
+
+<script>
+
+function registrar(){
+
+const nombre = document.getElementById("nombre").value
+const correo = document.getElementById("correo").value
+const usuario = document.getElementById("usuario").value
+const password = document.getElementById("password").value
+
+fetch("/crear-maestro",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+nombre,
+correo,
+usuario,
+password
+})
+})
+.then(res=>res.text())
+.then(data=>{
+alert(data)
+})
+}
+
+</script>
+
+</body>
+</html>

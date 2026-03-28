@@ -761,6 +761,30 @@ app.get("/test", (req, res) => {
   res.send("FUNCIONA")
 })
 
+//==============================
+//REGISTRAR MAESTRO
+//==============================
+
+app.post("/crear-maestro", (req, res) => {
+
+  const { nombre, correo, password } = req.body
+
+  db.query(
+    "INSERT INTO usuarios (nombre, correo, password, rol) VALUES (?, ?, ?, 'maestro')",
+    [nombre, correo, password],
+    (err, result) => {
+
+      if (err) {
+        console.log(err)
+        return res.send("Error al registrar maestro")
+      }
+
+      res.send("Maestro registrado correctamente")
+    }
+  )
+
+})
+
 // =============================
 // SERVIDOR
 // =============================
