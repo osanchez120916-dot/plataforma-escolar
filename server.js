@@ -786,6 +786,30 @@ app.post("/crear-maestro", (req, res) => {
 })
 
 // =============================
+// BORRAR ALUMNO
+// =============================
+
+
+app.delete("/alumnos/:id", (req, res) => {
+
+  const id = req.params.id
+
+  const sql = "DELETE FROM alumnos WHERE id = ?"
+
+  db.query(sql, [id], (err, result) => {
+
+    if (err) {
+      console.log(err)
+      return res.send("Error al eliminar alumno")
+    }
+
+    res.send("Alumno eliminado correctamente")
+
+  })
+
+})
+
+// =============================
 // SERVIDOR
 // =============================
 
