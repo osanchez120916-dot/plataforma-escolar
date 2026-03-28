@@ -81,11 +81,8 @@ border:1px solid #ddd;
 <h2>Registrar Alumno</h2>
 
 <input id="nombre" placeholder="Nombre">
-
 <input id="correo" placeholder="Correo">
-
 <input id="grado" placeholder="Grado">
-
 <input id="grupo" placeholder="Grupo">
 
 <select id="maestro">
@@ -93,12 +90,20 @@ border:1px solid #ddd;
 </select>
 
 <input type="file" id="foto">
-
 <img id="preview" width="120">
 
 <button onclick="crearAlumno()">Registrar</button>
 
 </div>
+
+<script>
+
+// 🔥 CARGAR MAESTROS (YA SIN LOCALHOST)
+fetch("/maestros")
+.then(res => res.json())
+.then(data => {
+
+let select = document.getElementById("maestro")
 
 data.forEach(m => {
 
@@ -112,6 +117,7 @@ select.appendChild(option)
 
 })
 
+// 🔥 REGISTRAR ALUMNO
 function crearAlumno(){
 
 const nombre = document.getElementById("nombre").value
@@ -121,6 +127,12 @@ const grupo = document.getElementById("grupo").value
 const maestro = document.getElementById("maestro").value
 const fotoInput = document.getElementById("foto")
 
+// VALIDACIÓN 🔥
+if(!nombre || !correo || !grado || !grupo || !maestro){
+alert("Llena todos los campos we 😡")
+return
+}
+
 const formData = new FormData()
 
 formData.append("nombre", nombre)
@@ -128,25 +140,25 @@ formData.append("correo", correo)
 formData.append("grado", grado)
 formData.append("grupo", grupo)
 formData.append("maestro_id", maestro)
-formData.append("foto", fotoInput.files[0])
 
+if(fotoInput.files[0]){
+formData.append("foto", fotoInput.files[0])
+}
+
+// 🔥 PETICIÓN SIN LOCALHOST
 fetch("/alumnos",{
 method:"POST",
 body:formData
 })
-
 .then(res => res.text())
 .then(data =>{
-
 alert(data)
 window.location.href = "alumnos.html"
-
 })
 
 }
 
-// preview
-
+// 🔥 PREVIEW DE FOTO
 document.getElementById("foto").addEventListener("change", function(){
 
 const file = this.files[0]
