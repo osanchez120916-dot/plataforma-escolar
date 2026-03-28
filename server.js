@@ -141,21 +141,18 @@ res.json({mensaje:"Usuario o contraseña incorrectos"})
 // VER ALUMNOS
 // =============================
 
-app.get("/alumnos",(req,res)=>{
+app.get("/alumnos", (req, res) => {
 
-const sql = `
-SELECT id,nombre,correo,grado,grupo,foto,papa_id,maestro_id
-FROM alumnos
-`
+  db.query("SELECT * FROM alumnos", (err, results) => {
 
-db.query(sql,(err,result)=>{
+    if (err) {
+      console.log("ERROR SQL:", err)
+      return res.send(err)
+    }
 
-if(err){
-console.log(err)
-res.send(err)
-}
+    res.json(results)
 
-})
+  })
 
 })
 
