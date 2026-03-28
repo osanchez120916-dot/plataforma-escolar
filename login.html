@@ -128,7 +128,7 @@ function login(){
 const usuario = document.getElementById("usuario").value
 const password = document.getElementById("password").value
 
-fetch("http://localhost:3001/login",{
+fetch("/login",{
 
 method:"POST",
 
@@ -197,7 +197,7 @@ const nueva = prompt("Ingresa tu nueva contraseña")
 
 if(!nueva) return
 
-fetch("http://localhost:3001/cambiar-password",{
+fetch("/cambiar-password",{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
