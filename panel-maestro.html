@@ -166,7 +166,7 @@ console.log("Maestro ID:", maestro_id)
 
 function mostrarAlumnos(){
 
-fetch("http://localhost:3001/maestro/alumnos/"+ maestro_id)
+fetch("/maestro/alumnos/" + maestro_id)
 
 .then(res => res.json())
 
