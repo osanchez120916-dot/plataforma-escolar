@@ -279,17 +279,16 @@ res.json(result)
 // ASIGNAR MAESTRO
 // =============================
 
-app.post("/admin/asignar-maestro",(req,res)=>{
+app.post("/admin/asignar-maestro", (req,res)=>{
 
 const { alumno_id, maestro_id } = req.body
 
 const sql = `
-UPDATE alumnos
-SET maestro_id=?
-WHERE id=?
+INSERT INTO alumnos_maestros (alumno_id, maestro_id)
+VALUES (?,?)
 `
 
-db.query(sql,[maestro_id,alumno_id],(err,result)=>{
+db.query(sql,[alumno_id, maestro_id],(err,result)=>{
 
 if(err){
 console.log(err)
@@ -306,23 +305,22 @@ res.send("Maestro asignado correctamente")
 // ALUMNOS DEL MAESTRO
 // =============================
 
-app.get("/maestro/alumnos/:id",(req,res)=>{
+app.post("/admin/asignar-maestro", (req,res)=>{
 
-const maestro_id = req.params.id
+const { alumno_id, maestro_id } = req.body
 
 const sql = `
-SELECT id,nombre,grado,grupo,foto
-FROM alumnos
-WHERE maestro_id=?
+INSERT INTO alumnos_maestros (alumno_id, maestro_id)
+VALUES (?,?)
 `
 
-db.query(sql,[maestro_id],(err,result)=>{
+db.query(sql,[alumno_id, maestro_id],(err,result)=>{
 
 if(err){
 console.log(err)
-res.send("Error")
+res.send("Error al asignar maestro")
 }else{
-res.json(result)
+res.send("Maestro asignado correctamente")
 }
 
 })
