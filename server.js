@@ -275,31 +275,6 @@ res.json(result)
 
 })
 
-// =============================
-// ASIGNAR MAESTRO
-// =============================
-
-app.post("/admin/asignar-maestro", (req,res)=>{
-
-const { alumno_id, maestro_id } = req.body
-
-const sql = `
-INSERT INTO alumnos_maestros (alumno_id, maestro_id)
-VALUES (?,?)
-`
-
-db.query(sql,[alumno_id, maestro_id],(err,result)=>{
-
-if(err){
-console.log(err)
-res.send("Error al asignar maestro")
-}else{
-res.send("Maestro asignado correctamente")
-}
-
-})
-
-})
 
 // =============================
 // ALUMNOS DEL MAESTRO
@@ -806,6 +781,35 @@ app.delete("/alumnos/:id", (req, res) => {
   })
 
 })
+
+// =============================
+// ALUMNOS DEL MAESTRO
+// =============================
+
+app.get("/maestro/alumnos/:id",(req,res)=>{
+
+const maestro_id = req.params.id
+
+const sql = `
+SELECT a.*
+FROM alumnos a
+JOIN alumnos_maestros am ON a.id = am.alumno_id
+WHERE am.maestro_id=?
+`
+
+db.query(sql,[maestro_id],(err,result)=>{
+
+if(err){
+console.log(err)
+res.send("Error")
+}else{
+res.json(result)
+}
+
+})
+
+})
+
 
 // =============================
 // SERVIDOR
