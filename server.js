@@ -3,6 +3,15 @@ const mysql = require("mysql2")
 const cors = require("cors")
 const bodyParser = require("body-parser")
 const multer = require("multer")
+const cloudinary = require("cloudinary").v2
+const { CloudinaryStorage } = require("multer-storage-cloudinary")
+
+
+cloudinary.config({
+  cloud_name: "dqmn54ti5",
+  api_key: "638872732227485",
+  api_secret: "WsOmSmm_YTiWolb9afTJE0xs3tc"
+})
 
 const app = express()
 const path = require("path")
@@ -44,20 +53,15 @@ console.log("Conectado a MySQL")
 // SUBIR FOTOS
 // =============================
 
-const storage = multer.diskStorage({
-
-destination: function(req,file,cb){
-cb(null,"uploads/")
-},
-
-filename: function(req,file,cb){
-cb(null, Date.now() + "-" + file.originalname)
-}
-
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "alumnos",
+    allowed_formats: ["jpg", "png", "jpeg"]
+  }
 })
 
-const upload = multer({storage:storage})
-
+const upload = multer({ storage })
 // =============================
 // SUBIR TAREAS
 // =============================
@@ -167,7 +171,7 @@ app.post("/alumnos", upload.single("foto"), (req,res)=>{
 
 const {nombre,correo,grado,grupo,papa_id,maestro_id} = req.body
 
-const foto = req.file ? req.file.filename : null
+const foto = req.file ? req.file.path : null
 
 const sql = `
 INSERT INTO alumnos(nombre,correo,grado,grupo,foto,papa_id,maestro_id)
