@@ -77,7 +77,7 @@ Generar usuarios papás
 
 <script>
 
-fetch("http://localhost:3001/papas")
+fetch("/papas")
 
 .then(res=>res.json())
 
@@ -109,7 +109,7 @@ document.getElementById("tabla-papas").innerHTML=tabla
 
 function generarUsuariosPapas(){
 
-fetch("http://localhost:3001/admin/generar-usuarios-papas",{
+fetch("/admin/generar-usuarios-papas",{
 method:"POST"
 })
 
