@@ -84,7 +84,7 @@ background:#1d4ed8;
 // CARGAR ALUMNOS AL INICIAR
 // =============================
 
-fetch("http://localhost:3001/alumnos")
+fetch("/alumnos")
 .then(res => res.json())
 .then(data => {
 
@@ -109,7 +109,7 @@ const telefono = document.getElementById("telefono").value
 const correo = document.getElementById("correo").value
 const alumno_id = document.getElementById("alumno_id").value
 
-fetch("http://localhost:3001/papas",{
+fetch("/papas",{
 
 method:"POST",
 
