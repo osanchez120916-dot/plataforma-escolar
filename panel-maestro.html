@@ -1,20 +1,18 @@
+```html
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 <title>Dashboard Maestro</title>
 
 <style>
-
 body{
 margin:0;
 font-family:Arial;
 display:flex;
 background:#f4f6f9;
 }
-
-/* MENU */
 
 .sidebar{
 width:220px;
@@ -40,8 +38,6 @@ cursor:pointer;
 background:#32465a;
 }
 
-/* CONTENIDO */
-
 .main{
 flex:1;
 padding:30px;
@@ -64,11 +60,6 @@ padding:10px;
 border-bottom:1px solid #ddd;
 }
 
-input{
-padding:10px;
-margin:5px;
-}
-
 button{
 padding:10px 20px;
 background:#3498db;
@@ -81,60 +72,39 @@ button:hover{
 background:#2980b9;
 }
 
-select{
-    padding: 10px;
-    margin: 5px;
-    width: 200px;
-}
-
 .topbar{
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    margin-bottom:20px;
+display:flex;
+justify-content:flex-end;
+margin-bottom:20px;
 }
 
 .logout-btn{
-    background:#e74c3c;
-    color:white;
-    border:none;
-    padding:10px 15px;
-    border-radius:5px;
-    cursor:pointer;
+background:#e74c3c;
+padding:10px;
+color:white;
+border:none;
+border-radius:5px;
 }
-
-.logout-btn:hover{
-    background:#c0392b;
-}
-
 </style>
 
 </head>
 
 <body>
 
-<!-- MENU -->
-
 <div class="sidebar">
-
 <h2>Maestro</h2>
-
 <a onclick="mostrarDashboard()">Dashboard</a>
 <a onclick="mostrarAlumnos()">Alumnos</a>
 <a onclick="mostrarCalificaciones()">Calificaciones</a>
 <a onclick="mostrarTareas()">Tareas</a>
 <a onclick="mostrarAsistencias()">Asistencias</a>
 <a onclick="verEntregas()">Tareas Entregadas</a>
-
-
 </div>
-
-<!-- CONTENIDO -->
 
 <div class="main">
 
-    <div class="topbar">
-    <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
+<div class="topbar">
+<button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
 </div>
 
 <div id="contenido"></div>
@@ -143,69 +113,55 @@ select{
 
 <script>
 
-// DASHBOARD
-
-function mostrarDashboard(){
-
-document.getElementById("contenido").innerHTML = `
-
-<div class="card">
-<h2>Bienvenido Maestro</h2>
-<p>Seleccione una opción del menú.</p>
-</div>
-
-`
-
-}
+// 🔥 URL BASE (LO IMPORTANTE)
+const API = "https://plataforma-escolar-production.up.railway.app"
 
 const maestro_id = localStorage.getItem("maestro_id")
 
-console.log("Maestro ID:", maestro_id)
+if(!maestro_id){
+alert("No hay sesión we")
+window.location.href="login.html"
+}
+
+// DASHBOARD
+function mostrarDashboard(){
+document.getElementById("contenido").innerHTML = `
+<div class="card">
+<h2>Bienvenido Maestro</h2>
+</div>`
+}
 
 // ALUMNOS
-
 function mostrarAlumnos(){
 
-fetch("/maestro/alumnos/" + maestro_id)
-
-.then(res => res.json())
-
-.then(data => {
+fetch(API + "/maestro/alumnos/" + maestro_id)
+.then(res=>res.json())
+.then(data=>{
 
 let html = `
-
 <div class="card">
-
 <h2>Lista de alumnos</h2>
-
 <table>
-
 <tr>
 <th>ID</th>
 <th>Nombre</th>
 <th>Grado</th>
 <th>Grupo</th>
 </tr>
-
 `
 
 data.forEach(a=>{
-
-html += `
-
+html+=`
 <tr>
 <td>${a.id}</td>
 <td>${a.nombre}</td>
 <td>${a.grado}</td>
 <td>${a.grupo}</td>
 </tr>
-
 `
-
 })
 
-html += `</table></div>`
-
+html += "</table></div>"
 document.getElementById("contenido").innerHTML = html
 
 })
@@ -213,30 +169,23 @@ document.getElementById("contenido").innerHTML = html
 }
 
 // CALIFICACIONES
-
 function mostrarCalificaciones(){
 
-fetch("http://localhost:3001/maestro/alumnos/"+ maestro_id)
+fetch(API + "/maestro/alumnos/" + maestro_id)
+.then(res=>res.json())
+.then(data=>{
 
-.then(res => res.json())
-
-.then(data => {
-
-let opciones = ""
+let opciones=""
 
 data.forEach(a=>{
-opciones += `<option value="${a.id}">${a.nombre} (${a.grado} ${a.grupo})</option>`
+opciones+=`<option value="${a.id}">${a.nombre}</option>`
 })
 
-document.getElementById("contenido").innerHTML = `
-
+document.getElementById("contenido").innerHTML=`
 <div class="card">
-
 <h2>Agregar Calificación</h2>
 
-<select id="alumno_id">
-${opciones}
-</select>
+<select id="alumno_id">${opciones}</select>
 
 <br><br>
 
@@ -244,9 +193,7 @@ ${opciones}
 <input id="calificacion" placeholder="Calificación">
 
 <button onclick="guardar()">Guardar</button>
-
 </div>
-
 `
 
 })
@@ -255,93 +202,57 @@ ${opciones}
 
 function guardar(){
 
-const alumno_id = document.getElementById("alumno_id").value
-const materia = document.getElementById("materia").value
-const calificacion = document.getElementById("calificacion").value
-
-fetch("http://localhost:3001/calificaciones",{
-
+fetch(API + "/calificaciones",{
 method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
+headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-alumno_id,
-materia,
-calificacion
+alumno_id:document.getElementById("alumno_id").value,
+materia:document.getElementById("materia").value,
+calificacion:document.getElementById("calificacion").value
 })
-
 })
-
-.then(res => res.text())
-.then(data=> alert(data))
+.then(res=>res.text())
+.then(alert)
 
 }
 
-// ASIGNAR TAREAS POR GRADO Y GRUPO
-
+// TAREAS
 function mostrarTareas(){
 
-fetch("http://localhost:3001/maestro/alumnos/" + maestro_id)
-
+fetch(API + "/maestro/alumnos/" + maestro_id)
 .then(res=>res.json())
-
 .then(data=>{
 
 let grupos=[]
 
 data.forEach(a=>{
-
-let combo=a.grado+"|"+a.grupo
-
-if(!grupos.includes(combo)){
-grupos.push(combo)
-}
-
+let g=a.grado+"|"+a.grupo
+if(!grupos.includes(g)) grupos.push(g)
 })
 
 let opciones=""
 
 grupos.forEach(g=>{
-
-let partes=g.split("|")
-
-opciones+=`<option value="${partes[0]}|${partes[1]}">
-${partes[0]} - Grupo ${partes[1]}
-</option>`
-
+let p=g.split("|")
+opciones+=`<option value="${p[0]}|${p[1]}">${p[0]} - ${p[1]}</option>`
 })
 
 document.getElementById("contenido").innerHTML=`
-
 <div class="card">
+<h2>Asignar tarea</h2>
 
-<h2>Asignar Tarea</h2>
-
-<label>Grupo</label>
-
-<select id="grupo_completo">
-
-${opciones}
-
-</select>
+<select id="grupo">${opciones}</select>
 
 <br><br>
 
-<input id="titulo" placeholder="Título de tarea">
-
+<input id="titulo" placeholder="Título">
 <input id="descripcion" placeholder="Descripción">
-
 <input type="date" id="fecha">
 
 <br><br>
 
 <button onclick="guardarTarea()">Guardar</button>
-
 </div>
-
 `
 
 })
@@ -350,87 +261,52 @@ ${opciones}
 
 function guardarTarea(){
 
-const combo=document.getElementById("grupo_completo").value
+let p=document.getElementById("grupo").value.split("|")
 
-const partes=combo.split("|")
-
-const grado=partes[0]
-const grupo=partes[1]
-
-const titulo=document.getElementById("titulo").value
-const descripcion=document.getElementById("descripcion").value
-const fecha=document.getElementById("fecha").value
-
-fetch("http://localhost:3001/tareas",{
-
+fetch(API + "/tareas",{
 method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
+headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-grado,
-grupo,
-titulo,
-descripcion,
-fecha
+grado:p[0],
+grupo:p[1],
+titulo:titulo.value,
+descripcion:descripcion.value,
+fecha:fecha.value
 })
-
 })
-
 .then(res=>res.text())
-
-.then(data=>{
-
-alert(data)
-
-})
+.then(alert)
 
 }
 
 // ASISTENCIAS
-
 function mostrarAsistencias(){
 
-fetch("http://localhost:3001/maestro/alumnos/" + maestro_id)
+fetch(API + "/maestro/alumnos/" + maestro_id)
+.then(res=>res.json())
+.then(data=>{
 
-.then(res => res.json())
-
-.then(data => {
-
-let opciones = ""
+let opciones=""
 
 data.forEach(a=>{
-opciones += `<option value="${a.id}">${a.nombre}</option>`
+opciones+=`<option value="${a.id}">${a.nombre}</option>`
 })
 
-document.getElementById("contenido").innerHTML = `
-
+document.getElementById("contenido").innerHTML=`
 <div class="card">
+<h2>Asistencia</h2>
 
-<h2>Registrar Asistencia</h2>
-
-<select id="alumno_id">
-${opciones}
-</select>
-
-<br><br>
+<select id="alumno_id">${opciones}</select>
 
 <input type="date" id="fecha">
 
 <select id="estado">
 <option>Presente</option>
 <option>Falta</option>
-<option>Retardo</option>
 </select>
 
-<br><br>
-
 <button onclick="guardarAsistencia()">Guardar</button>
-
 </div>
-
 `
 
 })
@@ -439,145 +315,64 @@ ${opciones}
 
 function guardarAsistencia(){
 
-const alumno_id = document.getElementById("alumno_id").value
-const fecha = document.getElementById("fecha").value
-const estado = document.getElementById("estado").value
-
-fetch("http://localhost:3001/asistencias",{
-
+fetch(API + "/asistencias",{
 method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
+headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-alumno_id,
-fecha,
-estado
+alumno_id:alumno_id.value,
+fecha:fecha.value,
+estado:estado.value
 })
-
 })
-
-.then(res => res.text())
-.then(data => alert(data))
+.then(res=>res.text())
+.then(alert)
 
 }
 
-// VER ENTREGAS
-
+// ENTREGAS
 function verEntregas(){
 
-fetch("http://localhost:3001/entregas")
-
+fetch(API + "/entregas")
 .then(res=>res.json())
-
 .then(data=>{
 
-let html = `
-
+let html=`
 <div class="card">
-
 <h2>Tareas entregadas</h2>
-
 <table>
-
 <tr>
 <th>Alumno</th>
 <th>Tarea</th>
 <th>Archivo</th>
-<th>Calificación</th>
-<th>Acción</th>
 </tr>
-
 `
 
 data.forEach(e=>{
-
-html += `
-
+html+=`
 <tr>
-
 <td>${e.nombre}</td>
-
 <td>${e.titulo}</td>
-
-<td>
-<a href="http://localhost:3001/tareas/${e.archivo}" target="_blank">
-Descargar
-</a>
-</td>
-
-<td>${e.calificacion ?? "Sin calificar"}</td>
-
-<td>
-
-<input type="number" id="nota${e.id}" placeholder="Calificación">
-
-<button onclick="calificar(${e.id})">
-Guardar
-</button>
-
-</td>
-
+<td><a href="${API}/tareas/${e.archivo}" target="_blank">Descargar</a></td>
 </tr>
-
 `
-
 })
 
-html += "</table></div>"
+html+="</table></div>"
+contenido.innerHTML=html
 
-document.getElementById("contenido").innerHTML = html
-
-})
-
-}
-
-function calificar(entrega_id){
-
-const calificacion = document.getElementById("nota"+entrega_id).value
-
-if(!calificacion){
-alert("Pon una calificación we")
-return
-}
-
-console.log("ID enviado:", entrega_id)
-console.log("Nota enviada:", calificacion)
-
-fetch("http://localhost:3001/calificar-tarea",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-entrega_id: Number(entrega_id),
-calificacion: Number(calificacion)
-})
-
-})
-
-.then(res=>res.text())
-.then(data=>{
-alert(data)
-verEntregas()
 })
 
 }
 
 function cerrarSesion(){
-    localStorage.removeItem("maestro_id")
-    window.location.href = "login.html"
+localStorage.removeItem("maestro_id")
+window.location.href="login.html"
 }
 
 mostrarDashboard()
-
 
 </script>
 
 </body>
 </html>
+```
