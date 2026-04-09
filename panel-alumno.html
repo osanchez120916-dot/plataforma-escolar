@@ -288,13 +288,26 @@ fetch(API + "/calificaciones/" + alumno_id)
 
 .then(data => {
 
-let contenido = `<h1>Boleta de Calificaciones</h1>`
+let contenido = `
+<h1>Boleta de Calificaciones</h1>
+<hr>
+`
+
+if(data.length === 0){
+contenido += "<p>No hay calificaciones</p>"
+}else{
 
 data.forEach(c=>{
-contenido += `<p>${c.materia}: ${c.calificacion}</p>`
+contenido += `
+<p><b>${c.materia}:</b> ${parseFloat(c.calificacion)}</p>
+`
 })
 
+}
+
+// 🔥 ABRIR VENTANA
 const ventana = window.open()
+
 ventana.document.write(contenido)
 ventana.print()
 
