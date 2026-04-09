@@ -108,6 +108,18 @@ fetch(API + "/alumno/" + alumno_id)
 
 .then(data => {
 
+let fotoURL = ""
+
+if(data.foto){
+if(data.foto.startsWith("http")){
+fotoURL = data.foto
+}else if(data.foto.startsWith("/uploads")){
+fotoURL = API + data.foto
+}else{
+fotoURL = API + "/uploads/" + data.foto
+}
+}
+
 document.getElementById("contenido").innerHTML = `
 
 <div class="card">
@@ -117,7 +129,7 @@ document.getElementById("contenido").innerHTML = `
 <p><b>Grado:</b> ${data.grado}</p>
 <p><b>Grupo:</b> ${data.grupo}</p>
 
-<img src="${API}/uploads/${data.foto}" width="150">
+<img src="${fotoURL}" width="150">
 
 </div>
 
@@ -139,7 +151,9 @@ fetch(API + "/calificaciones/" + alumno_id)
 
 .then(data => {
 
-if(data.length === 0){
+console.log("CALIFICACIONES:", data)
+
+if(!data || data.length === 0){
 document.getElementById("contenido").innerHTML = `
 <div class="card">
 <h2>No hay calificaciones</h2>
@@ -165,7 +179,7 @@ let html = `
 
 document.getElementById("contenido").innerHTML = html
 
-const ctx = document.getElementById("grafica")
+const ctx = document.getElementById("grafica").getContext("2d")
 
 new Chart(ctx,{
 type:"bar",
@@ -270,7 +284,7 @@ fetch(API + "/calificaciones/" + alumno_id)
 
 let contenido = `<h1>Boleta de Calificaciones</h1><hr>`
 
-if(data.length === 0){
+if(!data || data.length === 0){
 contenido += "<p>No hay calificaciones</p>"
 }else{
 data.forEach(c=>{
