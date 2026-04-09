@@ -155,7 +155,7 @@ let notas = []
 
 data.forEach(c=>{
 materias.push(c.materia)
-notas.push(c.calificacion)
+notas.push(parseFloat(c.calificacion))
 })
 
 let html = `
