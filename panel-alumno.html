@@ -104,13 +104,16 @@ padding-left:20px;
 
 <script>
 
+const API = "https://plataforma-escolar-production.up.railway.app"
 const alumno_id = localStorage.getItem("alumno_id")
 
+// =============================
 // PERFIL
+// =============================
 
 function verPerfil(){
 
-fetch("http://localhost:3001/alumno/" + alumno_id)
+fetch(API + "/alumno/" + alumno_id)
 
 .then(res => res.json())
 
@@ -120,13 +123,12 @@ document.getElementById("contenido").innerHTML = `
 
 <div class="card">
 
-<h2>"Bienvenid@" ${data.nombre}</h2>
-
+<h2>Bienvenid@ ${data.nombre}</h2>
 
 <p>Grado: ${data.grado}</p>
 <p>Grupo: ${data.grupo}</p>
 
-<img src="http://localhost:3001/uploads/${data.foto}" width="150">
+<img src="${data.foto}" width="150">
 
 </div>
 
@@ -136,11 +138,13 @@ document.getElementById("contenido").innerHTML = `
 
 }
 
+// =============================
 // CALIFICACIONES
+// =============================
 
 function verCalificaciones(){
 
-fetch("http://localhost:3001/calificaciones/" + alumno_id)
+fetch(API + "/calificaciones/" + alumno_id)
 
 .then(res => res.json())
 
@@ -171,9 +175,7 @@ document.getElementById("contenido").innerHTML = html
 const ctx = document.getElementById("grafica")
 
 new Chart(ctx,{
-
 type:"bar",
-
 data:{
 labels:materias,
 datasets:[{
@@ -181,18 +183,19 @@ label:"Calificaciones",
 data:notas
 }]
 }
-
 })
 
 })
 
 }
 
+// =============================
 // TAREAS
+// =============================
 
 function verTareas(){
 
-fetch("http://localhost:3001/tareas/" + alumno_id)
+fetch(API + "/tareas/" + alumno_id)
 
 .then(res => res.json())
 
@@ -203,7 +206,6 @@ let html = `<h2>Mis Tareas</h2>`
 data.forEach(t=>{
 
 let estado = t.archivo ? "✅ Entregada" : "❌ Pendiente"
-
 let calificacion = t.calificacion ? "⭐ Calificación: "+t.calificacion : ""
 
 html += `
@@ -242,11 +244,13 @@ document.getElementById("contenido").innerHTML = html
 
 }
 
+// =============================
 // ASISTENCIAS
+// =============================
 
 function verAsistencias(){
 
-fetch("http://localhost:3001/asistencias/" + alumno_id)
+fetch(API + "/asistencias/" + alumno_id)
 
 .then(res => res.json())
 
@@ -257,11 +261,9 @@ let html = "<div class='card'><h2>Asistencias</h2>"
 data.forEach(a=>{
 
 html += `
-
 <p>
-${new Date(a.fecha).toLocaleDateString('es-MX')}- ${a.estado}
+${new Date(a.fecha).toLocaleDateString('es-MX')} - ${a.estado}
 </p>
-
 `
 
 })
@@ -274,79 +276,77 @@ document.getElementById("contenido").innerHTML = html
 
 }
 
-// cargar perfil al entrar
-
-verPerfil()
+// =============================
+// BOLETA
+// =============================
 
 function descargarBoleta(){
 
-fetch("http://localhost:3001/calificaciones/" + alumno_id)
+fetch(API + "/calificaciones/" + alumno_id)
 
 .then(res => res.json())
 
 .then(data => {
 
-let contenido = `
-<h1>Boleta de Calificaciones</h1>
-`
+let contenido = `<h1>Boleta de Calificaciones</h1>`
 
 data.forEach(c=>{
-
-contenido += `
-<p>${c.materia}: ${c.calificacion}</p>
-`
-
+contenido += `<p>${c.materia}: ${c.calificacion}</p>`
 })
 
 const ventana = window.open()
-
 ventana.document.write(contenido)
-
 ventana.print()
 
 })
 
 }
 
+// =============================
+// SUBIR TAREA
+// =============================
+
 function subirTarea(tarea_id){
 
 const archivo = document.getElementById("archivo"+tarea_id).files[0]
 
 const formData = new FormData()
-
 formData.append("archivo", archivo)
 formData.append("tarea_id", tarea_id)
 formData.append("alumno_id", alumno_id)
 
-fetch("http://localhost:3001/entregar-tarea",{
-
+fetch(API + "/entregar-tarea",{
 method:"POST",
 body:formData
-
 })
-
 .then(res=>res.text())
-
 .then(data=>{
-
 alert(data)
-verTareas() // 🔥 ACTUALIZA LA VISTA
-
+verTareas()
 })
 
 }
+
+// =============================
+// SESIÓN
+// =============================
 
 function CerrarSesion(){
-   // if (confirm("Seguro que quieres salir de tu plataforma")){
-        localStorage.removeItem("alumno_id")
-        alert("Sesion cerrada")
-        window.location.href="login.html"
-    }
-//}
+localStorage.removeItem("alumno_id")
+alert("Sesion cerrada")
+window.location.href="login.html"
+}
 
 if(!localStorage.getItem("alumno_id")){
-    window.location.href="login.html"
+window.location.href="login.html"
 }
+
+// =============================
+// INICIO
+// =============================
+
+verPerfil()
+
 </script>
 
 </body>
