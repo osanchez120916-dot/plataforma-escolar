@@ -7,8 +7,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <title>Panel Alumno</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
 
+<style>
 body{
 font-family:Arial;
 background:#f4f6f9;
@@ -17,12 +17,10 @@ display:flex;
 }
 
 .sidebar{
-
 width:220px;
 background:#1f2d3d;
 color:white;
 height:100vh;
-
 }
 
 .sidebar h2{
@@ -34,36 +32,13 @@ padding:20px;
 display:block;
 padding:15px;
 cursor:pointer;
+color:white;
+transition:0.2s;
 }
 
 .sidebar a:hover{
 background:#32465a;
-}
-
-.main{
-flex:1;
-padding:30px;
-}
-
-.card{
-
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 5px 15px rgba(0,0,0,0.2);
-
-}
-
-img{
-border-radius:10px;
-}
-
-.sidebar a{
-display:block;
-padding:15px;
-cursor:pointer;
-color:white;
-transition:0.2s;
+padding-left:20px;
 }
 
 .sidebar a i{
@@ -72,9 +47,21 @@ width:20px;
 text-align:center;
 }
 
-.sidebar a:hover{
-background:#32465a;
-padding-left:20px;
+.main{
+flex:1;
+padding:30px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+margin-bottom:20px;
+}
+
+img{
+border-radius:10px;
 }
 </style>
 
@@ -83,29 +70,31 @@ padding-left:20px;
 <body>
 
 <div class="sidebar">
+<h2><i class="fa-solid fa-user-graduate"></i> Alumno</h2>
 
-<h2><i class ="fa-solid fa-user-graduate"></i>Alumno</h2>
+<a onclick="verPerfil()"><i class="fa-solid fa-user"></i>Mi Perfil</a>
+<a onclick="verCalificaciones()"><i class="fa-solid fa-chart-column"></i>Calificaciones</a>
+<a onclick="verTareas()"><i class="fa-solid fa-book"></i>Tareas</a>
+<a onclick="verAsistencias()"><i class="fa-solid fa-calendar-check"></i>Asistencias</a>
+<a onclick="descargarBoleta()"><i class="fa-solid fa-file-pdf"></i>Boleta</a>
 
-<a onclick="verPerfil()"><i class ="fa-solid fa-user"></i>Mi Perfil</a>
-<a onclick="verCalificaciones()"><i class ="fa-solid fa-chart-column"></i>Calificaciones</a>
-<a onclick="verTareas()"><i class ="fa-solid fa-book"></i>Tareas</a>
-<a onclick="verAsistencias()"><i class ="fa-solid fa-calendar-check"></i>Asistencias</a>
-<a onclick="descargarBoleta()"><i class ="fa-solid fa-file-pdf"></i>Boleta</a>
 <button onclick="CerrarSesion()" style="width:100%;padding:15px;background:none;border:none;color:#f87171;text-align:left;cursor:pointer;">
 <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
 </button>
 </div>
 
 <div class="main">
-
 <div id="contenido"></div>
-
 </div>
 
 <script>
 
 const API = "https://plataforma-escolar-production.up.railway.app"
 const alumno_id = localStorage.getItem("alumno_id")
+
+if(!alumno_id){
+window.location.href="login.html"
+}
 
 // =============================
 // PERFIL
@@ -125,10 +114,10 @@ document.getElementById("contenido").innerHTML = `
 
 <h2>Bienvenid@ ${data.nombre}</h2>
 
-<p>Grado: ${data.grado}</p>
-<p>Grupo: ${data.grupo}</p>
+<p><b>Grado:</b> ${data.grado}</p>
+<p><b>Grupo:</b> ${data.grupo}</p>
 
-<img src="${data.foto}" width="150">
+<img src="${API}/uploads/${data.foto}" width="150">
 
 </div>
 
@@ -150,6 +139,15 @@ fetch(API + "/calificaciones/" + alumno_id)
 
 .then(data => {
 
+if(data.length === 0){
+document.getElementById("contenido").innerHTML = `
+<div class="card">
+<h2>No hay calificaciones</h2>
+</div>
+`
+return
+}
+
 let materias = []
 let notas = []
 
@@ -159,15 +157,10 @@ notas.push(parseFloat(c.calificacion))
 })
 
 let html = `
-
 <div class="card">
-
 <h2>Mis Calificaciones</h2>
-
 <canvas id="grafica"></canvas>
-
 </div>
-
 `
 
 document.getElementById("contenido").innerHTML = html
@@ -209,31 +202,24 @@ let estado = t.archivo ? "✅ Entregada" : "❌ Pendiente"
 let calificacion = t.calificacion ? "⭐ Calificación: "+t.calificacion : ""
 
 html += `
+<div class="card">
 
-<div class="card" style="margin-bottom:20px">
-
-<h3>📚 ${t.titulo}</h3>
+<h3>${t.titulo}</h3>
 
 <p>${t.descripcion}</p>
 
-<p><b>📅 Entrega:</b> ${new Date(t.fecha).toLocaleDateString('es-MX')}</p>
+<p><b>Entrega:</b> ${new Date(t.fecha).toLocaleDateString('es-MX')}</p>
 
-<p><b>Estado:</b> ${estado}</p>
-
+<p>${estado}</p>
 <p>${calificacion}</p>
 
 ${!t.archivo ? `
 <input type="file" id="archivo${t.id}">
 <br><br>
-<button onclick="subirTarea(${t.id})">
-Subir tarea
-</button>
-` : `
-<p>Archivo enviado</p>
-`}
+<button onclick="subirTarea(${t.id})">Subir tarea</button>
+` : `<p>Archivo enviado</p>`}
 
 </div>
-
 `
 
 })
@@ -259,13 +245,7 @@ fetch(API + "/asistencias/" + alumno_id)
 let html = "<div class='card'><h2>Asistencias</h2>"
 
 data.forEach(a=>{
-
-html += `
-<p>
-${new Date(a.fecha).toLocaleDateString('es-MX')} - ${a.estado}
-</p>
-`
-
+html += `<p>${new Date(a.fecha).toLocaleDateString('es-MX')} - ${a.estado}</p>`
 })
 
 html += "</div>"
@@ -288,26 +268,17 @@ fetch(API + "/calificaciones/" + alumno_id)
 
 .then(data => {
 
-let contenido = `
-<h1>Boleta de Calificaciones</h1>
-<hr>
-`
+let contenido = `<h1>Boleta de Calificaciones</h1><hr>`
 
 if(data.length === 0){
 contenido += "<p>No hay calificaciones</p>"
 }else{
-
 data.forEach(c=>{
-contenido += `
-<p><b>${c.materia}:</b> ${parseFloat(c.calificacion)}</p>
-`
+contenido += `<p><b>${c.materia}:</b> ${parseFloat(c.calificacion)}</p>`
 })
-
 }
 
-// 🔥 ABRIR VENTANA
 const ventana = window.open()
-
 ventana.document.write(contenido)
 ventana.print()
 
@@ -346,11 +317,7 @@ verTareas()
 
 function CerrarSesion(){
 localStorage.removeItem("alumno_id")
-alert("Sesion cerrada")
-window.location.href="login.html"
-}
-
-if(!localStorage.getItem("alumno_id")){
+alert("Sesión cerrada")
 window.location.href="login.html"
 }
 
@@ -363,5 +330,4 @@ verPerfil()
 </script>
 
 </body>
-
 </html>
