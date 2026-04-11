@@ -138,6 +138,8 @@ fetch(API + "/maestro/alumnos/" + maestro_id)
 .then(res=>res.json())
 .then(data=>{
 
+console.log("DATOS", data)
+
 let html = `
 <div class="card">
 <h2>Lista de alumnos</h2>
