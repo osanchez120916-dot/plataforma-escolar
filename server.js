@@ -15,6 +15,7 @@ cloudinary.config({
 
 const app = express()
 const path = require("path")
+const { REFUSED } = require("dns")
 
 app.use(express.static(path.join(__dirname)))
 
@@ -170,6 +171,8 @@ app.get("/alumnos", (req, res) => {
 app.post("/alumnos", upload.single("foto"), (req,res)=>{
 
 const {nombre,correo,grado,grupo,papa_id,maestro_id} = req.body
+
+const maestros = JSON.parse(req.body.maestros)
 
 const foto = req.file ? req.file.path : null
 

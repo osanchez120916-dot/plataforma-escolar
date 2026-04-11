@@ -139,7 +139,7 @@ formData.append("nombre", nombre)
 formData.append("correo", correo)
 formData.append("grado", grado)
 formData.append("grupo", grupo)
-formData.append("maestros", JSON.parse(req.body.maestros))
+formData.append("maestros", JSON.stringify(maestros))
 
 if(fotoInput.files[0]){
 formData.append("foto", fotoInput.files[0])
