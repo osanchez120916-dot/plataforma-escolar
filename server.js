@@ -174,23 +174,30 @@ const {nombre,correo,grado,grupo,papa_id,maestro_id} = req.body
 const foto = req.file ? req.file.path : null
 
 const sql = `
-INSERT INTO alumnos(nombre,correo,grado,grupo,foto,papa_id,maestro_id)
-VALUES (?,?,?,?,?,?,?)
+INSERT INTO alumnos(nombre,correo,grado,grupo,foto,papa_id)
+VALUES (?,?,?,?,?,?)
 `
 
-db.query(sql,[nombre,correo,grado,grupo,foto,papa_id,maestro_id],(err,result)=>{
+db.query(sql,[nombre,correo,grado,grupo,foto,papa_id],(err,result)=>{
 
 if(err){
 console.log(err)
-res.send("Error al registrar alumno")
-}else{
-res.send("Alumno registrado")
+return res.send("Error al registrar alumno")
 }
 
-})
+// 🔥 AQUÍ GUARDAS EN LA TABLA INTERMEDIA
+const alumno_id = result.insertId
+
+db.query(`
+INSERT INTO alumnos_maestros (alumno_id, maestro_id, grado, grupo)
+VALUES (?,?,?,?)
+`, [alumno_id, maestro_id, grado, grupo])
+
+res.send("Alumno registrado")
 
 })
 
+})
 // =============================
 // CREAR USUARIO ALUMNO
 // =============================
