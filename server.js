@@ -795,7 +795,11 @@ app.get("/maestro/alumnos/:id",(req,res)=>{
 const maestro_id = req.params.id
 
 const sql = `
-SELECT a.*
+SELECT
+ a.id,
+ a.nombre,
+ am.grado,
+ am.grupo
 FROM alumnos a
 JOIN alumnos_maestros am ON a.id = am.alumno_id
 WHERE am.maestro_id=?
